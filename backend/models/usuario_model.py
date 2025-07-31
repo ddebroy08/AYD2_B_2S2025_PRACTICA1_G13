@@ -82,6 +82,80 @@ def subir_foto(url):
             }
         ), 500
 
+def agregar_tarjeta(numero, fecha_vencimiento, cvv, tipo):
+    id_usuario = current_user.id
+    
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se pudo conectar a la base de datos en agregar_tarjeta"
+            }
+        ), 500
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""INSERT INTO tarjeta (id_usuario, numero, fecha_vencimiento, codigo_seguridad, tipo) VALUES (%s, %s, %s, %s, %s)""",
+                        (id_usuario, numero, fecha_vencimiento, cvv, tipo))
+            conn.commit()
+        conn.close()
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Tarjeta agregada correctamente"
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al agregar la tarjeta: {str(e)}"
+            }
+        ), 500
+
+def actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, cvv, tipo):
+    id_usuario = current_user.id
+    
+    conn = get_postgres_connection()
+    if not conn: 
+        return jsonify(
+            {
+                "status":" Error",
+                "message": "No se pudo conectar a la base de datos en actualizar_tarjeta"
+            }
+        )
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM tarjeta WHERE id_usuario = %s AND numero = %s", (id_usuario, numero_antiguo))
+            tarjeta = cursor.fetchone()
+            if not tarjeta:
+                return jsonify(
+                    {
+                        "status": "Error",
+                        "message": "Tarjeta no encontrada"
+                    }
+                ), 404
+            tarjeta_id = tarjeta[0]
+            cursor.execute("""UPDATE tarjeta SET numero = %s, fecha_vencimiento = %s, codigo_seguridad = %s, tipo = %s WHERE id = %s""",
+                        (numero, fecha_vencimiento, cvv, tipo, tarjeta_id))
+            conn.commit()
+            return jsonify(
+                {
+                    "status": "Success",
+                    "message": "Tarjeta actualizada correctamente"
+                }
+            ), 200
+        cursor.close()
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al actualizar la tarjeta: {str(e)}"
+            }
+        ), 500
+
+
 
 class Usuario(flask_login.UserMixin):
     def __init__(self, id, email, id_rol):
