@@ -1,7 +1,7 @@
 from config import get_postgres_connection
 import bcrypt, flask_login
 from flask import jsonify
-from utils.validators import email_existe, safety_password
+from utils.validators import email_existe, safety_password, generar_saldo_random
 from flask_login import current_user
 
 
@@ -82,8 +82,13 @@ def subir_foto(url):
             }
         ), 500
 
-def agregar_tarjeta(numero, fecha_vencimiento, cvv, tipo):
+def agregar_tarjeta(numero, fecha_vencimiento, cvv, tipo, saldo=None):
     id_usuario = current_user.id
+    print(f"ID usuario {id_usuario}")
+    if saldo is None:
+        saldo = float(generar_saldo_random())
+        print(f"Saldo generado: {saldo}")
+        print(type(saldo))
     
     conn = get_postgres_connection()
     if not conn:
@@ -95,8 +100,8 @@ def agregar_tarjeta(numero, fecha_vencimiento, cvv, tipo):
         ), 500
     try:
         with conn.cursor() as cursor:
-            cursor.execute("""INSERT INTO tarjeta (id_usuario, numero, fecha_vencimiento, codigo_seguridad, tipo) VALUES (%s, %s, %s, %s, %s)""",
-                        (id_usuario, numero, fecha_vencimiento, cvv, tipo))
+            cursor.execute("""INSERT INTO tarjeta (id_usuario, numero, fecha_vencimiento, codigo_seguridad, tipo, saldo) VALUES (%s, %s, %s, %s, %s, %s)""",
+                        (id_usuario, numero, fecha_vencimiento, cvv, tipo, saldo))
             conn.commit()
         conn.close()
         return jsonify(
@@ -114,8 +119,12 @@ def agregar_tarjeta(numero, fecha_vencimiento, cvv, tipo):
             }
         ), 500
 
-def actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, cvv, tipo):
+def actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, cvv, tipo, saldo = None):
     id_usuario = current_user.id
+    
+    if saldo is None:
+        saldo = float(generar_saldo_random())
+        print(f"Saldo generado: {saldo}")
     
     conn = get_postgres_connection()
     if not conn: 
@@ -137,8 +146,8 @@ def actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, cvv, tipo):
                     }
                 ), 404
             tarjeta_id = tarjeta[0]
-            cursor.execute("""UPDATE tarjeta SET numero = %s, fecha_vencimiento = %s, codigo_seguridad = %s, tipo = %s WHERE id = %s""",
-                        (numero, fecha_vencimiento, cvv, tipo, tarjeta_id))
+            cursor.execute("""UPDATE tarjeta SET numero = %s, fecha_vencimiento = %s, codigo_seguridad = %s, tipo = %s, saldo = %s WHERE id = %s""",
+                        (numero, fecha_vencimiento, cvv, tipo, saldo, tarjeta_id))
             conn.commit()
             return jsonify(
                 {

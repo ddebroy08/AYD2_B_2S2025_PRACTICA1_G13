@@ -25,6 +25,10 @@ def tarjeta_existente(numero):
         cursor.execute("SELECT * FROM tarjeta WHERE numero = %s", (numero,))
         return cursor.fetchone() is not None
 
+def generar_saldo_random():
+    import random
+    return round(random.uniform(1500.0, 10000.0), 2)
+
 def safety_password(password):
     return (
         len(password) >= 8 and
