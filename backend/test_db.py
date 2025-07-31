@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import psycopg2
 from config import get_postgres_connection
+import bcrypt
 
 app = Flask(__name__)
 
@@ -28,3 +29,19 @@ def test_connection():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+def actualizar_contrasena(email, nueva_password):
+    conn = get_postgres_connection()
+    with conn.cursor() as cursor:
+        hashed = bcrypt.hashpw(nueva_password.encode('utf-8'), bcrypt.gensalt())
+        hashed_str = hashed.decode('utf-8')
+        cursor.execute("""
+            UPDATE usuario
+            SET password = %s
+            WHERE email = %s
+        """, (hashed_str, email))
+        conn.commit()
+    conn.close()
+
+actualizar_contrasena("diego@gmail.com", "NuevaContraSegura123*")
