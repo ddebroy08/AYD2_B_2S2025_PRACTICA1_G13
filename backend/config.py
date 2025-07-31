@@ -5,7 +5,7 @@ def get_postgres_connection():
         connection = psycopg2.connect(
             host="localhost",
             port=5432,
-            dbname="mystreamingapp",
+            dbname="postgres",
             user="myuser",
             password="mypassword"
         )
