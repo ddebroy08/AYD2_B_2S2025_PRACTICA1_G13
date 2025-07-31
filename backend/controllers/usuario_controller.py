@@ -258,3 +258,4 @@ def actualizar_tarjeta_controller(data):
                 "message": f"Error al actualizar la tarjeta: {str(e)}"
             }
         ), 500
+

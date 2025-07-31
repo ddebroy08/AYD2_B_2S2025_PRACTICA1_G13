@@ -46,8 +46,8 @@ CREATE TABLE TARJETA(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES USUARIO(id)
 );
-
-SELECT * FROM tarjeta WHERE id_usuario = 1 AND numero = '12345678912';
+ALTER TABLE tarjeta ALTER COLUMN saldo TYPE DECIMAL(8, 2);
+COMMIT;
 
 CREATE TABLE PLAN(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -58,6 +58,23 @@ CREATE TABLE PLAN(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO PLAN (nombre, precio, nivel, descripcion) VALUES
+
+('Mensual', 120, 'Basico', 'Acceso mensual al contenido básico.'),
+('Mensual', 180, 'Pro', 'Acceso mensual al contenido Pro con más funciones.'),
+('Mensual', 240, 'Premium', 'Acceso mensual completo sin restricciones.'),
+
+
+('Bimestral', 216, 'Basico', 'Acceso por 2 meses al contenido básico con 10% de ahorro.'),
+('Bimestral', 324, 'Pro', 'Acceso por 2 meses al contenido Pro con 10% de ahorro.'),
+('Bimestral', 432, 'Premium', 'Acceso por 2 meses al contenido Premium con 10% de ahorro.'),
+
+
+('Anual', 1152, 'Basico', 'Acceso anual al contenido básico con 20% de ahorro.'),
+('Anual', 1728, 'Pro', 'Acceso anual al contenido Pro con 20% de ahorro.'),
+('Anual', 2304, 'Premium', 'Acceso anual completo sin restricciones y con 20% de ahorro.');
+COMMIT;
 
 CREATE TABLE SUSCRIPCION(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -192,5 +209,11 @@ SELECT id, nombre, email, created_at, updated_at FROM usuario ORDER BY id;
 DELETE FROM TARJETA;
 commit;
 ALTER SEQUENCE tarjeta_id_seq RESTART WITH 1;
+
+SELECT * FROM information_schema.triggers WHERE event_object_table = 'tarjeta';
+SELECT current_database();
+SELECT current_schema();
+
+SELECT * FROM tarjeta;
 
 ALTER SEQUENCE usuario_id_seq RESTART WITH 1;
