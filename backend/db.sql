@@ -177,5 +177,16 @@ DROP TABLE IF EXISTS ROL CASCADE;
 DROP FUNCTION IF EXISTS actualizar_updated_at() CASCADE;
 
 
-\c ayd2_proyecto
-\dt
+ALTER TABLE usuario ADD CONSTRAINT unique_email UNIQUE (email);
+commit;
+
+SELECT pg_get_serial_sequence('usuario', 'id');
+SELECT last_value FROM public.usuario_id_seq;
+SELECT MAX(id) FROM usuario;
+
+
+SELECT id, nombre, email, created_at, updated_at FROM usuario ORDER BY id;
+
+
+
+ALTER SEQUENCE usuario_id_seq RESTART WITH 1;
