@@ -47,6 +47,8 @@ CREATE TABLE TARJETA(
     FOREIGN KEY (id_usuario) REFERENCES USUARIO(id)
 );
 
+SELECT * FROM tarjeta WHERE id_usuario = 1 AND numero = '12345678912';
+
 CREATE TABLE PLAN(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR(30) CHECK (nombre IN ('Mensual', 'Bimestral', 'Anual')) DEFAULT 'Mensual',
@@ -187,6 +189,8 @@ SELECT MAX(id) FROM usuario;
 
 SELECT id, nombre, email, created_at, updated_at FROM usuario ORDER BY id;
 
-
+DELETE FROM TARJETA;
+commit;
+ALTER SEQUENCE tarjeta_id_seq RESTART WITH 1;
 
 ALTER SEQUENCE usuario_id_seq RESTART WITH 1;

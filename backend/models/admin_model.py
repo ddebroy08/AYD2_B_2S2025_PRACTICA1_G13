@@ -11,7 +11,9 @@ def insertar_administrador(nombre, email, password, nit, id_rol=0):
             VALUES (%s, %s, %s, %s, %s)
         """, (id_rol, nombre, email, hashed_pw, nit))
         conn.commit()
-        
+
+
+
 
 class Administrador(flask_login.UserMixin):
     def __init__(self, id, email, id_rol):

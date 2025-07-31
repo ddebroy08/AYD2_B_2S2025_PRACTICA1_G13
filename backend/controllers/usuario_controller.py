@@ -1,6 +1,6 @@
 from flask import jsonify
-from models.usuario_model import insertar_usuario, actualizar_usuario, subir_foto
-from utils.validators import email_existe, safety_password, login
+from models.usuario_model import insertar_usuario, actualizar_usuario, subir_foto, agregar_tarjeta, actualizar_tarjeta
+from utils.validators import email_existe, safety_password, login, tarjeta_existente
 from config import get_postgres_connection
 from flask_login import current_user
 import bcrypt
@@ -135,6 +135,8 @@ def actualizar_usuario_controller(nombre, email, password, nit):
             }
         ), 500
 
+
+
 def subir_foto_controller(data):
     # Lógica para subir la foto
     url = data.get("url_img")
@@ -169,5 +171,90 @@ def subir_foto_controller(data):
             {
                 "status": "Error",
                 "message": f"Error al subir la foto: {str(e)}"
+            }
+        ), 500
+
+
+def agregar_tarjeta_controller(data):
+    numero = data.get("numero")
+    fecha_vencimiento = data.get("fecha_vencimiento")
+    codigo_seguridad = data.get("codigo_seguridad")
+    tipo = data.get("tipo")
+    
+    if not all([numero, fecha_vencimiento, codigo_seguridad, tipo]):
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "Faltan campos obligatorios"
+            }
+        ), 400
+    
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se pudo conectar a la base de datos"
+            }
+        ), 500
+    if tarjeta_existente(numero):
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "La tarjeta ya existe"
+            }
+        ), 400
+        
+    try:
+        agregar_tarjeta(numero, fecha_vencimiento, codigo_seguridad, tipo)
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Tarjeta agregada correctamente"
+            }
+        )
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al agregar la tarjeta: {str(e)}"
+            }
+        ), 500
+        
+def actualizar_tarjeta_controller(data):
+    numero_antiguo = data.get("numero_antiguo")
+    numero = data.get("numero")
+    fecha_vencimiento = data.get("fecha_vencimiento")
+    codigo_seguridad = data.get("codigo_seguridad")
+    tipo = data.get("tipo")
+    
+    if not all([numero, fecha_vencimiento, codigo_seguridad, tipo]):
+        return jsonify(
+            {
+                "stataus": "Error",
+                "message": "Actualizar TODOS los campos"
+            }
+        )
+    
+    if not numero_antiguo:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "Proporcionar número antiguo de la tarjeta para actualizar"
+            }
+        ), 400
+    try:
+        actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, codigo_seguridad, tipo)
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Tarjeta actualizada correctamente"
+            }
+        )
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al actualizar la tarjeta: {str(e)}"
             }
         ), 500

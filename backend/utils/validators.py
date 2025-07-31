@@ -9,8 +9,20 @@ def email_existe(email):
     conn = get_postgres_connection()
     with conn.cursor() as cursor:
         conn = get_postgres_connection()
-        print(conn.dsn)  # Esto imprime la cadena de conexión usada
         cursor.execute("SELECT * FROM usuario WHERE email = %s", (email,))
+        return cursor.fetchone() is not None
+
+def tarjeta_existente(numero):
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se pudo conectar a la base de datos"
+            }
+        )
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM tarjeta WHERE numero = %s", (numero,))
         return cursor.fetchone() is not None
 
 def safety_password(password):

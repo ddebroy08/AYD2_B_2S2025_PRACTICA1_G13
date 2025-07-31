@@ -1,5 +1,5 @@
 from flask import jsonify
-from utils.validators import email_existe, safety_password
+from utils.validators import email_existe, safety_password, login
 
 
 def crear_admin_controller(data):
@@ -42,4 +42,17 @@ def crear_admin_controller(data):
                 "message": f"Error al crear el administrador: {str(e)}"
             }
         )
+
+def admin_login_controller(data):
+    email = data.get("email")
+    password = data.get("password")
     
+    if not email or not password:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "Email y contraseña son obligatorios"
+            }
+        )
+    return login(email, password)
+
