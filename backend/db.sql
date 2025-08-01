@@ -89,6 +89,13 @@ CREATE TABLE SUSCRIPCION(
     FOREIGN KEY (id_plan) REFERENCES PLAN(id)
 );
 
+ALTER TABLE suscripcion
+ALTER COLUMN fecha_inicio SET DEFAULT CURRENT_DATE;
+ALTER TABLE suscripcion
+ALTER COLUMN fecha_vencimiento DROP NOT NULL;
+COMMIT;
+
+
 CREATE TABLE CATEGORIA_CONTENIDO(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR(30) NOT NULL,
@@ -206,9 +213,9 @@ SELECT MAX(id) FROM usuario;
 
 SELECT id, nombre, email, created_at, updated_at FROM usuario ORDER BY id;
 
-DELETE FROM TARJETA;
+DELETE FROM suscripcion;
 commit;
-ALTER SEQUENCE tarjeta_id_seq RESTART WITH 1;
+ALTER SEQUENCE suscripcion_id_seq RESTART WITH 1;
 
 SELECT * FROM information_schema.triggers WHERE event_object_table = 'tarjeta';
 SELECT current_database();

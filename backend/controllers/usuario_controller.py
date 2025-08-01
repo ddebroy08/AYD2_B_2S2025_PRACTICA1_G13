@@ -1,9 +1,10 @@
 from flask import jsonify
-from models.usuario_model import insertar_usuario, actualizar_usuario, subir_foto, agregar_tarjeta, actualizar_tarjeta
+from models.usuario_model import insertar_usuario, actualizar_usuario, subir_foto, agregar_tarjeta, actualizar_tarjeta, agregar_suscripcion
 from utils.validators import email_existe, safety_password, login, tarjeta_existente
 from config import get_postgres_connection
 from flask_login import current_user
 import bcrypt
+
 
 
 
@@ -259,3 +260,39 @@ def actualizar_tarjeta_controller(data):
             }
         ), 500
 
+
+def agregar_suscripcion_controller(data):
+    id_plan = data.get("id_plan")
+    
+    if not all([id_plan]):
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "Faltan campos obligatorios"
+            }
+        ), 400
+
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se pudo conectar a la base de datos"
+            }
+        ), 500
+    try:
+        agregar_suscripcion(id_plan)
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Suscripción agregada correctamente"
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al agregar la suscripción: {str(e)}"
+            }
+        ), 500
+    

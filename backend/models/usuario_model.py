@@ -1,8 +1,9 @@
 from config import get_postgres_connection
 import bcrypt, flask_login
 from flask import jsonify
-from utils.validators import email_existe, safety_password, generar_saldo_random
+from utils.validators import email_existe, safety_password, generar_saldo_random, fecha_vencimiento
 from flask_login import current_user
+from datetime import datetime
 
 
 def insertar_usuario(nombre, email, password, nit, id_rol=1):
@@ -164,6 +165,88 @@ def actualizar_tarjeta(numero_antiguo, numero, fecha_vencimiento, cvv, tipo, sal
             }
         ), 500
 
+def agregar_suscripcion(id_plan):
+    id_usuario = current_user.id
+    print(f"ID usuario: {id_usuario}, ID plan: {id_plan}")
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se pudo conectar a la base de datos en agregar_suscripcion"
+            }
+        ), 500
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id_usuario, id_plan, fecha_inicio, fecha_vencimiento, estado FROM suscripcion WHERE id_usuario = %s", (current_user.id,))
+            result = cursor.fetchone()
+            if result:
+                id_usuario_db, id_plan_db, fecha_inicio, fecha_vencimiento_db, estado = result
+                print(f"Estado de la suscripción: {estado}")
+                cursor.execute("SELECT nombre FROM plan WHERE id = %s", (id_plan_db,))
+                nombre_plan = cursor.fetchone()[0]
+                print(f"Nombre del plan: {nombre_plan}")
+                if not fecha_vencimiento_db:
+                    fecha_vencimiento_db = fecha_vencimiento(nombre_plan)
+                print(f"Fecha de vencimiento: {fecha_vencimiento_db}")
+                print(f"Fecha actual: {datetime.now().date()}")
+                print(f"Estado de la suscripción: {estado}")
+                if (estado and estado.strip().upper() == 'ACTIVO') or (fecha_vencimiento_db and fecha_vencimiento_db > datetime.now().date()):
+                    print("El usuario ya tiene una suscripción activa")
+                    return jsonify(
+                        {
+                            "status": "Error",
+                            "message": "El usuario ya tiene una suscripción activa"
+                        }
+                    ), 400
+            cursor.execute("SELECT precio FROM plan WHERE id = %s", (id_plan,))
+            precio_plan = cursor.fetchone()[0]
+            print(f"precio del plan: {precio_plan}")
+            cursor.execute("SELECT saldo FROM tarjeta WHERE id_usuario = %s", (id_usuario,))
+            tarjetas = cursor.fetchall()
+            if not tarjetas:
+                return jsonify(
+                    {
+                        "status": "Error",
+                        "message": "No se encontraron tarjetas asociadas al usuario"
+                    }
+                ), 404
+            saldo = tarjetas[0][0]
+            print(f"Saldo de la tarjeta: {(saldo)}")
+            if saldo < precio_plan:
+                return jsonify(
+                    {
+                        "status": "Error",
+                        "message": "Saldo insuficiente para agregar la suscripción"
+                    }
+                ), 400
+            saldo_nuevo = saldo - precio_plan
+            print(f"Saldo nuevo: {saldo_nuevo}")
+            print(datetime.now().date())
+            cursor.execute("UPDATE tarjeta SET saldo = %s WHERE id_usuario = %s", (saldo_nuevo, id_usuario))
+            print("insertando suscripcion....")
+            cursor.execute("SELECT nombre FROM plan WHERE id = %s", (id_plan,))
+            nombre_plan = cursor.fetchone()[0]
+            fecha_vencimiento_db = fecha_vencimiento(nombre_plan)
+            print(f"Fecha de vencimiento: {fecha_vencimiento_db}")
+            cursor.execute("INSERT INTO suscripcion (id_usuario, id_plan, fecha_inicio, fecha_vencimiento) VALUES (%s, %s, %s, %s)", (id_usuario, id_plan, datetime.now().date(), fecha_vencimiento_db))
+            conn.commit()
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Suscripción agregada correctamente"
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al agregar la suscripción: {str(e)}"
+            }
+        ), 500
+    finally:
+        if conn:
+            conn.close()
 
 
 class Usuario(flask_login.UserMixin):
