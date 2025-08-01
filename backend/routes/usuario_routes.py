@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.usuario_controller import crear_usuario_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller
+from controllers.usuario_controller import crear_usuario_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller, agregar_suscripcion_controller
 from flask import jsonify
 from utils.validators import logout
 from flask_login import login_required
@@ -71,3 +71,18 @@ def update_card():
             }
         ), 400
     return actualizar_tarjeta_controller(data)
+
+
+@usuario_bp.route('/add-suscription', methods=['POST'])
+@login_required
+def get_suscription():
+    data = request.get_json()
+    if not data:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": "No se recibieron datos"
+            }
+        ), 400
+    return agregar_suscripcion_controller(data)
+

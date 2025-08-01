@@ -1,5 +1,6 @@
 from config import get_postgres_connection
-
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import re
 from flask import jsonify
 import flask_login
@@ -37,6 +38,16 @@ def safety_password(password):
         re.search(r"[0-9]", password) and
         re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
     )
+    
+def fecha_vencimiento(duracion):
+    ahora = datetime.now().date()
+    
+    if duracion == "Mensual":
+        return ahora + relativedelta(months=1)
+    elif duracion == "Bimestral":
+        return ahora + relativedelta(months=3)
+    elif duracion == "Anual":
+        return ahora + relativedelta(years=1)
 
 def login(email, password):
     from models.usuario_model import Usuario
