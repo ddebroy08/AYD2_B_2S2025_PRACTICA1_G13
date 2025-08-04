@@ -35,6 +35,17 @@ CREATE TABLE USUARIO(
     FOREIGN KEY (id_img) REFERENCES IMG(id)
 );
 
+-- INSERTAR EL ADMIN
+INSERT INTO usuario (id_rol, nombre, email, password, nit)
+VALUES (2, 'admin', 'admin@gmail.com', 'PassAdmin123', '123654987');
+COMMIT;
+
+DELETE FROM USUARIO
+WHERE id_rol = 2;
+COMMIT;
+ALTER SEQUENCE usuario_id_seq RESTART WITH 3;
+
+
 CREATE TABLE TARJETA(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_usuario INTEGER NOT NULL,
@@ -104,6 +115,20 @@ CREATE TABLE CATEGORIA_CONTENIDO(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO CATEGORIA_CONTENIDO (nombre, descripcion) VALUES
+('Matemáticas', 'Contenido relacionado con álgebra, geometría, cálculo y otras ramas de las matemáticas.'),
+('Tecnología y Computación', 'Cursos y materiales sobre programación, redes, sistemas operativos y más.'),
+('Historia Universal', 'Material educativo sobre los eventos y procesos históricos del mundo.'),
+('Música', 'Recursos para aprender teoría musical, instrumentos y producción musical.'),
+('Marketing Digital', 'Estrategias y herramientas para promocionar productos o servicios en línea.'),
+('Nutrición', 'Información sobre alimentación saludable, dietas balanceadas y suplementos.'),
+('Idiomas', 'Cursos para aprender inglés, francés, japonés y otros idiomas.'),
+('Fotografía', 'Técnicas, estilos y edición fotográfica para principiantes y avanzados.'),
+('Negocios y Finanzas', 'Temas sobre administración, emprendimiento e inversión personal.'),
+('Desarrollo Personal', 'Contenidos orientados al crecimiento emocional, productividad y liderazgo.');
+COMMIT;
+
+
 CREATE TABLE CONTENIDO(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_categoria INTEGER NOT NULL,
@@ -115,6 +140,10 @@ CREATE TABLE CONTENIDO(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_categoria) REFERENCES CATEGORIA_CONTENIDO(id)
 );
+
+ALTER TABLE contenido
+ADD descripcion VARCHAR(250);
+COMMIT;
 
 CREATE TABLE BITACORA_REPRODUCCION(
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
