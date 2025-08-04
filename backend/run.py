@@ -1,5 +1,6 @@
 from flask import Flask
 from routes.usuario_routes import usuario_bp
+from routes.admin_routes import admin_bp
 from models.usuario_model import Usuario
 import flask_login
 
@@ -14,6 +15,7 @@ def load_user(user_id):
     return Usuario.get_by_id(user_id)
 
 app.register_blueprint(usuario_bp)
+app.register_blueprint(admin_bp)
 
 
 

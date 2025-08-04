@@ -50,8 +50,7 @@ def fecha_vencimiento(duracion):
         return ahora + relativedelta(years=1)
 
 def login(email, password):
-    from models.usuario_model import Usuario
-    from models.admin_model import Administrador
+    from models.usuario import Usuario
     try:
         conn = get_postgres_connection()
         cursor = conn.cursor()
@@ -64,10 +63,7 @@ def login(email, password):
         if result:
             user_id, hashed_password, id_rol, user_mail = result
             if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
-                if id_rol == 2:
-                    admin = Administrador(user_id, user_mail, id_rol)
-                if id_rol == 1:
-                    user = Usuario(user_id, user_mail, id_rol)
+                user = Usuario(user_id, user_mail, id_rol)
                 flask_login.login_user(user)
                 return {
                     "status": "success",
