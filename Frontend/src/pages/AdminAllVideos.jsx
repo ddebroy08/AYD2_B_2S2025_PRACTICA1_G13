@@ -3,14 +3,11 @@ import { useEffect, useState } from "react";
 export default function AdminAllVideos() {
   const [videos, setVideos] = useState([]);
 
-  // Función para convertir URL de YouTube a formato embed
   const getEmbedUrl = (url) => {
     if (!url) return "";
     
-    // Para URLs de YouTube (youtube.com/watch?v= o youtu.be/)
     if (url.includes("youtube.com/watch?v=")) {
       const videoId = url.split("v=")[1]?.split("&")[0];
-      // Añadir parámetros para forzar reproducción embebida
       return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
     }
     
@@ -18,8 +15,6 @@ export default function AdminAllVideos() {
       const videoId = url.split("youtu.be/")[1]?.split("?")[0];
       return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
     }
-    
-    // Para URLs de Vimeo
     if (url.includes("vimeo.com/")) {
       const videoId = url.split("vimeo.com/")[1]?.split("?")[0];
       return `https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0`;

@@ -3,6 +3,7 @@ from models.usuario_model import insertar_usuario, actualizar_usuario, subir_fot
 from utils.validators import email_existe, safety_password, login, tarjeta_existente
 from config import get_postgres_connection
 from flask_login import current_user
+from datetime import datetime
 import bcrypt
 
 
@@ -185,44 +186,36 @@ def agregar_tarjeta_controller(data):
     tipo = data.get("tipo")
     
     if not all([numero, fecha_vencimiento, codigo_seguridad, tipo]):
-        return jsonify(
-            {
-                "status": "Error",
-                "message": "Faltan campos obligatorios"
-            }
-        ), 400
-    
+        return jsonify({
+            "status": "Error",
+            "message": "Faltan campos obligatorios"
+        }), 400
+
     conn = get_postgres_connection()
     if not conn:
-        return jsonify(
-            {
-                "status": "Error",
-                "message": "No se pudo conectar a la base de datos"
-            }
-        ), 500
+        return jsonify({
+            "status": "Error",
+            "message": "No se pudo conectar a la base de datos"
+        }), 500
+
     if tarjeta_existente(numero):
-        return jsonify(
-            {
-                "status": "Error",
-                "message": "La tarjeta ya existe"
-            }
-        ), 400
-        
+        return jsonify({
+            "status": "Error",
+            "message": "La tarjeta ya existe"
+        }), 400
+
     try:
         agregar_tarjeta(numero, fecha_vencimiento, codigo_seguridad, tipo)
-        return jsonify(
-            {
-                "status": "Success",
-                "message": "Tarjeta agregada correctamente"
-            }
-        )
+        return jsonify({
+            "status": "Success",
+            "message": "Tarjeta agregada correctamente"
+        }), 200
     except Exception as e:
-        return jsonify(
-            {
-                "status": "Error",
-                "message": f"Error al agregar la tarjeta: {str(e)}"
-            }
-        ), 500
+        return jsonify({
+            "status": "Error",
+            "message": f"Error al agregar la tarjeta: {str(e)}"
+        }), 500
+
         
 def actualizar_tarjeta_controller(data):
     numero_antiguo = data.get("numero_antiguo")
@@ -298,3 +291,185 @@ def agregar_suscripcion_controller(data):
             }
         ), 500
     
+def obtener_usuario_actual_controller():
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify({
+            "status": "Error",
+            "message": "No se pudo conectar a la base de datos"
+        }), 500
+
+    try:
+        id_usuario = current_user.id
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT nombre, email, nit FROM usuario WHERE id = %s", (id_usuario,))
+            usuario = cursor.fetchone()
+            if not usuario:
+                return jsonify({
+                    "status": "Error",
+                    "message": "Usuario no encontrado"
+                }), 404
+
+            return jsonify({
+                "status": "Success",
+                "data": {
+                    "nombre": usuario[0],
+                    "email": usuario[1],
+                    "nit": usuario[2]
+                }
+            }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "Error",
+            "message": f"Error al obtener datos del usuario: {str(e)}"
+        }), 500
+    finally:
+        conn.close()
+
+
+def get_card_controller():
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify({
+            "status": "Error",
+            "message": "No se pudo conectar a la base de datos"
+        }), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT numero, fecha_vencimiento, codigo_seguridad, tipo FROM tarjeta WHERE id_usuario = %s LIMIT 1", (current_user.id,))
+            tarjeta = cursor.fetchone()
+
+            if not tarjeta:
+                return jsonify({
+                    "status": "Error",
+                    "message": "No se encontró tarjeta asociada al usuario"
+                }), 404
+
+            numero, fecha_vencimiento, codigo_seguridad, tipo = tarjeta
+
+            return jsonify({
+                "status": "Success",
+                "data": {
+                    "numero_antiguo": numero,
+                    "numero": numero,
+                    "fecha_vencimiento": fecha_vencimiento.strftime("%Y-%m"),
+                    "codigo_seguridad": codigo_seguridad,
+                    "tipo": tipo
+                }
+            }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "Error",
+            "message": f"Error al obtener la tarjeta: {str(e)}"
+        }), 500
+        
+def cancelar_suscripcion_controller():
+    try:
+        conn = get_postgres_connection()
+        if not conn:
+            return jsonify(
+                {
+                    "status": "Error",
+                    "message": "No se pudo conectar a la base de datos"
+                }
+            ), 500
+
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM suscripcion 
+                WHERE id_usuario = %s AND estado = 'ACTIVO'
+            """, (current_user.id,))
+            
+            if cursor.rowcount == 0:
+                return jsonify(
+                    {
+                        "status": "Error",
+                        "message": "No tienes una suscripción activa para cancelar."
+                    }
+                ), 400
+
+            conn.commit()
+
+        return jsonify(
+            {
+                "status": "Success",
+                "message": "Suscripción cancelada y eliminada exitosamente."
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "Error",
+                "message": f"Error al cancelar suscripción: {str(e)}"
+            }
+        ), 500
+    finally:
+        if conn:
+            conn.close()
+            
+def obtener_videos_con_suscripcion():
+    conn = get_postgres_connection()
+    if not conn:
+        return jsonify({
+            "status": "Error",
+            "message": "No se pudo conectar a la base de datos"
+        }), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT estado, fecha_vencimiento
+                FROM suscripcion
+                WHERE id_usuario = %s
+                ORDER BY fecha_inicio DESC
+                LIMIT 1;
+            """, (current_user.id,))
+            suscripcion = cursor.fetchone()
+
+            if not suscripcion:
+                return jsonify({
+                    "status": "Error",
+                    "message": "No tienes ninguna suscripción."
+                }), 403
+
+            estado, fecha_vencimiento = suscripcion
+
+            if estado != 'ACTIVO' or (fecha_vencimiento and fecha_vencimiento < datetime.now().date()):
+                return jsonify({
+                    "status": "Error",
+                    "message": "Tu suscripción no está activa."
+                }), 403
+
+            cursor.execute("""
+                SELECT id, titulo, descripcion, link_video
+                FROM contenido;
+            """)
+            rows = cursor.fetchall()
+
+            videos = [
+                {
+                    "id": row[0],
+                    "title": row[1],
+                    "description": row[2],
+                    "url": row[3]
+                }
+                for row in rows
+            ]
+
+            return jsonify({
+                "status": "Success",
+                "videos": videos
+            }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "Error",
+            "message": f"Error al obtener videos: {str(e)}"
+        }), 500
+
+    finally:
+        conn.close()
+

@@ -26,6 +26,7 @@ export default function Login() {
 
       if (data.status === 'success') {
         console.log('Login exitoso:', data.id_rol);
+        localStorage.setItem('id_rol', data.id_rol);
         if (data.id_rol === 1) {
           navigate('/home');
         } else if (data.id_rol === 2) {

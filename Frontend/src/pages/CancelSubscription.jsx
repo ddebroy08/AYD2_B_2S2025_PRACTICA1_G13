@@ -6,15 +6,14 @@ export default function CancelSubscription() {
 
   const handleCancel = async () => {
     setLoading(true);
-    try {
-      const token = localStorage.getItem("token"); // Asegúrate de guardar el token en login
+    try {// Asegúrate de guardar el token en login
 
       const response = await fetch("http://localhost:5000/cancel-subscription", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
+        credentials: "include"
       });
 
       const data = await response.json();
