@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.usuario_controller import crear_usuario_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller, agregar_suscripcion_controller
+from controllers.usuario_controller import crear_usuario_controller,obtener_videos_con_suscripcion ,cancelar_suscripcion_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller, agregar_suscripcion_controller, obtener_usuario_actual_controller, get_card_controller
 from flask import jsonify
 from utils.validators import logout
 from flask_login import login_required
@@ -51,13 +51,12 @@ def add_picture():
 def add_card():
     data = request.get_json()
     if not data: 
-        return jsonify(
-            {
-                "status": "Error",
-                "message": "No se recibieron datos"
-            }
-        ), 400
+        return jsonify({
+            "status": "Error",
+            "message": "No se recibieron datos"
+        }), 400
     return agregar_tarjeta_controller(data)
+
 
 @usuario_bp.route('/update-card', methods=['PUT'])
 @login_required
@@ -85,4 +84,27 @@ def get_suscription():
             }
         ), 400
     return agregar_suscripcion_controller(data)
+
+
+@usuario_bp.route('/current-user', methods=['GET'])
+@login_required
+def obtener_usuario_actual():
+    return obtener_usuario_actual_controller()
+
+@usuario_bp.route('/get-card', methods=['GET'])
+@login_required
+def get_card():
+    return get_card_controller()
+
+@usuario_bp.route('/cancel-subscription', methods=['POST'])
+@login_required
+def cancel_subscription():
+    return cancelar_suscripcion_controller()
+
+@usuario_bp.route('/user/all', methods=['GET'])
+@login_required
+def get_all_videos():
+    return obtener_videos_con_suscripcion()
+
+
 

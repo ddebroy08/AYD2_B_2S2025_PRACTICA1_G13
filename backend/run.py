@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from routes.usuario_routes import usuario_bp
 from routes.admin_routes import admin_bp
 from models.usuario_model import Usuario
@@ -6,6 +7,7 @@ import flask_login
 
 app = Flask(__name__)
 app.secret_key = 'secret_pass'
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
