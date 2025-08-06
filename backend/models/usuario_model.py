@@ -7,15 +7,15 @@ from datetime import datetime
 from .usuario import Usuario
 
 
-def insertar_usuario(nombre, email, password, nit, id_rol=1):
+def insertar_usuario(nombre, email, password, nit, fecha_nacimiento, id_rol=1):
     conn = get_postgres_connection()
     with conn.cursor() as cursor:
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         hashed_str = hashed.decode('utf-8')
         cursor.execute("""
-            INSERT INTO usuario (id_rol, nombre, email, password, nit)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (id_rol, nombre, email, hashed_str, nit))
+            INSERT INTO usuario (id_rol, nombre, email, password, nit, fecha_nacimiento)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (id_rol, nombre, email, hashed_str, nit, fecha_nacimiento))
         conn.commit()
     conn.close()
     

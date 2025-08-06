@@ -13,8 +13,9 @@ def crear_usuario_controller(data):
     email = data.get("email")
     password = data.get("password")
     nit = data.get("nit")
+    fecha_nacimiento = data.get("fecha_nacimiento")
 
-    if not all([nombre, email, password, nit]):
+    if not all([nombre, email, password, nit, fecha_nacimiento]):
         return jsonify(
             {
                 "status": "Error",
@@ -39,7 +40,7 @@ def crear_usuario_controller(data):
         ), 400
 
     try:
-        insertar_usuario(nombre, email, password, nit)
+        insertar_usuario(nombre, email, password, nit, fecha_nacimiento)
         return jsonify(
             {
                 "status": "Success",
@@ -53,6 +54,7 @@ def crear_usuario_controller(data):
                 "message": f"Error en DB: {str(e)}"
             }
         ), 500
+
 
 def usuario_login_controller(data):
     email = data.get("email")

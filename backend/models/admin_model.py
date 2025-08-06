@@ -56,7 +56,7 @@ def agregar_contenido(categoria, titulo, descripcion, anio, sinopsis, url):
             rol = cursor.fetchone()[0]
             if rol == 2:
                 #obtener el id de la cateria 
-                cursor.execute("SELECT id FROM categoria_contenido WHERE nombre = %s", (categoria,))
+                cursor.execute("SELECT id FROM categoria_contenido WHERE id = %s", (categoria,))
                 categoria_id = cursor.fetchone()
                 if not categoria_id:
                     return jsonify(
@@ -149,33 +149,34 @@ def buscar_por_anio(anio):
         })
     try:
         with conn.cursor() as cursor:
+            # Usar EXTRACT(YEAR FROM ...) para extraer solo el año de la fecha
             cursor.execute("""
                 SELECT c.id_categoria, c.titulo, c.anio_creacion, c.sinopsis, c.link_video, c.descripcion,
                        cc.nombre
                 FROM contenido c
                 JOIN categoria_contenido cc ON c.id_categoria = cc.id
-                WHERE c.anio_creacion = %s
+                WHERE EXTRACT(YEAR FROM c.anio_creacion) = %s
             """, (anio,))
             videos = cursor.fetchall()
-
+            
             if not videos:
                 return jsonify({
                     "status": "Success",
                     "message": "No hay videos disponibles para el año especificado"
                 }), 200
-
+            
             video_list = []
             for video in videos:
                 video_data = {
                     "titulo": video[1],
-                    "anio_creacion": video[2],
+                    "anio_creacion": video[2],  # Esto seguirá siendo la fecha completa
                     "sinopsis": video[3],
                     "link_video": video[4],
                     "descripcion": video[5],
                     "categoria": video[6]
                 }
                 video_list.append(video_data)
-
+            
             return jsonify({
                 "status": "Success",
                 "videos": video_list
@@ -187,7 +188,6 @@ def buscar_por_anio(anio):
         }), 500
     finally:
         conn.close()
-        
         
 def buscar_por_titulo(titulo):
     conn = get_postgres_connection()
