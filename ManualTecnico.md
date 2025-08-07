@@ -100,6 +100,4 @@
 | RF-009   | El sistema debe registrar una bitácora de los contenidos visualizados por cada cliente. |
 | RF-010   | El sistema debe mostrar recomendaciones personalizadas en la página de inicio del cliente. |
 | RF-011   | El administrador debe poder registrar nuevo contenido (películas, series, trailers, etc.). |
-| RF-012   | El administrador debe poder editar o eliminar contenido existente.                      |
-| RF-013   | El administrador debe tener acceso a un dashboard para buscar y visualizar el catálogo. |
-| RF-014   | El sistema debe permitir cerrar sesión de forma segura para cualquier usuario.          |
+| RF-012   | El sistema debe permitir cerrar sesión de forma segura para cualquier usuario.          |
