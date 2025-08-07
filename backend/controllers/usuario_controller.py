@@ -473,3 +473,17 @@ def obtener_videos_con_suscripcion():
     finally:
         conn.close()
 
+def registrar_reproduccion_controller(id_contenido):
+    conn = get_postgres_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO bitacora_reproduccion (id_usuario, id_contenido, fecha_reproduccion)
+                VALUES (%s, %s, CURRENT_DATE)
+            """, (current_user.id, id_contenido))
+            conn.commit()
+        return jsonify({"status": "Success", "message": "Reproducción registrada"}), 200
+    except Exception as e:
+        return jsonify({"status": "Error", "message": str(e)}), 500
+    finally:
+        conn.close()

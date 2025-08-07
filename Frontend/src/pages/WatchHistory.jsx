@@ -10,7 +10,7 @@ export default function WatchHistory() {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5000/watch-history", {
+        const response = await fetch("http://localhost:5000", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
