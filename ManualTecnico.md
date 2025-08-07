@@ -2,7 +2,7 @@
 
 
 
-## 1. Elección y Justificación del Framework (5 pts)
+## 1. Elección y Justificación del Framework
 
 - *Framework Seleccionado: **React* v19.1.0
 - *Routing*: react-router-dom v7.7.1
@@ -17,7 +17,7 @@
 
 
 
-## 2. Elección y Justificación del Patrón de Diseño (5 pts)
+## 2. Elección y Justificación del Patrón de Diseño
 
 - *Patrón de Diseño Utilizado: **Modelo-Vista-Controlador (MVC)*
 
@@ -36,14 +36,14 @@
 
 
 
-## 3. Casos de Uso de Alto Nivel (5 pts)
+## 3. Casos de Uso de Alto Nivel
 
 ### CU-000: Casos de Uso de Alto Nivel - StreamZone
 
 ![CU000](./img/casos-uso-alto-nivel.png)
 
 
-## 4. Casos de Uso Expandidos (10 pts)
+## 4. Casos de Uso Expandidos
 
 > A continuación se listan los títulos de los casos de uso expandidos. Puedes insertar cada imagen de PlantUML debajo del título correspondiente:
 
@@ -73,7 +73,7 @@
 
 
 
-## 5. Descripción de Requerimientos No Funcionales (5 pts)
+## 5. Descripción de Requerimientos No Funcionales
 
 | Categoría         | Descripción                                                                                   |
 |-------------------|-----------------------------------------------------------------------------------------------|
@@ -85,7 +85,7 @@
 | *Portabilidad*   | Despliegue con Docker, compatible con múltiples entornos cloud.                              |
 
 
-## 6. Requerimientos Funcionales (10 pts)
+## 6. Requerimientos Funcionales
 
 | ID       | Requerimiento Funcional                                                                 |
 |----------|------------------------------------------------------------------------------------------|
