@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.usuario_controller import crear_usuario_controller,obtener_videos_con_suscripcion ,cancelar_suscripcion_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller, agregar_suscripcion_controller, obtener_usuario_actual_controller, get_card_controller
+from controllers.usuario_controller import crear_usuario_controller,registrar_reproduccion_controller ,obtener_videos_con_suscripcion ,cancelar_suscripcion_controller, usuario_login_controller, actualizar_usuario_controller, subir_foto_controller, agregar_tarjeta_controller, actualizar_tarjeta_controller, agregar_suscripcion_controller, obtener_usuario_actual_controller, get_card_controller
 from flask import jsonify
 from utils.validators import logout
 from flask_login import login_required
@@ -106,5 +106,7 @@ def cancel_subscription():
 def get_all_videos():
     return obtener_videos_con_suscripcion()
 
-
-
+@usuario_bp.route('/watch/<int:id_contenido>', methods=['POST'])
+@login_required
+def ver_video(id_contenido):
+    return registrar_reproduccion_controller(id_contenido)

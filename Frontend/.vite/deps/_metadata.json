@@ -2,6 +2,7 @@
   "hash": "3e873adc",
   "configHash": "40c704a0",
   "lockfileHash": "816cd7db",
+<<<<<<< HEAD
   "browserHash": "85f9bd5c",
   "optimized": {
     "react": {
@@ -31,4 +32,9 @@
       "file": "chunk-WYQRYOQT.js"
     }
   }
+=======
+  "browserHash": "0ec39690",
+  "optimized": {},
+  "chunks": {}
+>>>>>>> feature/201906143
 }
