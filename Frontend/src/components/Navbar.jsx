@@ -15,18 +15,16 @@ export default function Navbar() {
           <Link to="/register" style={styles.link}>Registro</Link>
         </>
       )}
-
-      {token && (
         <>
-          <Link to="/update-profile" style={styles.link}>Actualizar Perfil</Link>
+          <Link to="/update-user" style={styles.link}>Actualizar Perfil</Link>
           <Link to="/upload-photo" style={styles.link}>Subir Foto</Link>
           <Link to="/add-card" style={styles.link}>Agregar Tarjeta</Link>
           <Link to="/update-card" style={styles.link}>Actualizar Tarjeta</Link>
           <Link to="/add-subscription" style={styles.link}>Suscripción</Link>
           <Link to="/cancel-subscription" style={styles.link}>Cancelar Suscripción</Link>
-          <Link to="/history" style={styles.link}>Historial</Link>
+          <Link to="/watch-history" style={styles.link}>Historial</Link>
         </>
-      )}
+   
 
       {token && isAdmin && (
         <>

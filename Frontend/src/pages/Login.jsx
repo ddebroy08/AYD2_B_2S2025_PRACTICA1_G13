@@ -14,7 +14,7 @@ export default function Login() {
         <button type="submit">Ingresar</button>
       </form>
 
-      <div style={{ marginTop: '1rem' }}>
+      <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
         <Link to="/register">Ir a registro</Link>
       </div>
     </div>

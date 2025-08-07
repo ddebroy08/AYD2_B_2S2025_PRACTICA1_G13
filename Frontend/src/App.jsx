@@ -36,7 +36,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/update-user" element={<UpdateUser />} />
-        <Route path="/upload-picture" element={<UploadPhoto />} />
+        <Route path="/upload-photo" element={<UploadPhoto />} />
         <Route path="/add-card" element={<AddCard />} />
         <Route path="/update-card" element={<UpdateCard />} />
         <Route path="/add-subscription" element={<AddSubscription />} />
